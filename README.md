@@ -1,2 +1,2 @@
 # gameoflife
-Simulate conway's game of life in Golang
+A simple version of conway's game of life using Javascript

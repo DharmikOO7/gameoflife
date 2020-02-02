@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<title>Game of life</title>
+
+<head>
+    Game of life
+</head>
+<style>
+    table.holder {
+        width: 100%;
+        height: 100%;
+    }
+    
+    table.holder .partition {
+        width: 50%;
+        height: 100%;
+        border: 1px solid black;
+    }
+    
+    table:not(.holder) {
+        border-collapse: collapse;
+    }
+    
+    td.live {
+        background-color: black;
+    }
+    
+    td {
+        height: 0.6rem;
+        width: 0.6rem;
+        border: 1px solid #CCC;
+    }
+    
+    #seed {}
+</style>
+
+
+<body>
+    <input id="cells" placeholder="no. of cells" type="number" name="cells" min="9" onchange="customGrid(this.value)">
+    <input id="totalGenerations" placeholder="no. of gen." type="number" name="cells" min="1">
+    <button onclick="play()">Play</button>
+    <button onclick="next()">Next</button>
+    <button onclick="stop()">Stop</button>
+    <button onclick="continueGen()">Continue</button>
+    <button onclick="reset()">Reset All</button>
+    
+    <table class="holder">
+        <tbody>
+            <tr>
+                <td class="left partition">
+                    <table id="seed"></table>
+                </td>
+                <td class="right partition">
+                    <table id="grid"></table>
+                    <button onclick="resetGrid()" style="float: right;">Reset Itrn</button>
+                    <span id="demo2"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table class="holder">
+
+    <script type="text/javascript" src="gameoflife.js"></script>
+</body>
+
+</html>
