@@ -1,27 +1,62 @@
 const live = 1;
 const dead = 0;
-let defaultNoOfCells=45;
-let grid=null; 
+let isDrawing = false;
+let defaultNoOfCells = 45;
+let grid = null;
 let totalGenerations, n = defaultNoOfCells, currentGen = 1, toStop = false;
-let customGrid = (size=n) => {
-    clearTable(size,"seed");
+let customGrid = (size = n) => {
+    clearTable(size, "seed");
     grid = initialize2dArray(size);
     dispGridAsTable(size, "seed");
+    let setStateHelper = (tbl, i, j) => {
+        if (grid[i][j] == live) {
+            grid[i][j] = dead;
+            tbl.rows[i].cells[j].className = "dead"
+        } else {
+            grid[i][j] = live;
+            tbl.rows[i].cells[j].className = "live"
+        }
+        isDrawing = true;
+    }
     //allows user to select seed state
     var tbl = document.getElementById("seed");
     if (tbl != null) {
-        for (let i = 0; i < tbl.rows.length; i++) {
-            for (let j = 0; j < tbl.rows[i].cells.length; j++)
-                tbl.rows[i].cells[j].onclick = () => {
-                    if (grid[i][j] == live) {
-                        grid[i][j] = dead;
-                        tbl.rows[i].cells[j].className = "dead"
-                    } else {
-                        grid[i][j] = live;
-                        tbl.rows[i].cells[j].className = "live"
-                    }
-                };
-        }
+        const rowAll = document.querySelectorAll('#seed tr');
+        const rowsArray = Array.from(rowAll);
+        tbl.addEventListener('mousedown', e => {
+            const rowIndex = rowsArray.findIndex(row => row.contains(e.target));
+            const columns = Array.from(rowsArray[rowIndex].querySelectorAll('td'));
+            const columnIndex = columns.findIndex(column => column == e.target);
+            console.log(`Started in ${rowIndex}, ${columnIndex}`);
+            isDrawing = true;
+            setStateHelper(tbl, rowIndex, columnIndex);
+        });
+        tbl.addEventListener('mouseout', e => {
+            console.log('mouseout');
+            console.log(e.relatedTarget);
+            const rowIndex = rowsArray.findIndex(row => row.contains(e.relatedTarget));
+            const columns = Array.from(rowsArray[rowIndex].querySelectorAll('td'));
+            const columnIndex = columns.findIndex(column => column == e.relatedTarget);
+            // console.log(`not draw mouse move in ${rowIndex}, ${columnIndex}`);
+            if (isDrawing === true) {
+                console.log(`draw mouse move in ${rowIndex}, ${columnIndex}`);
+                // console.log(rowIndex, columnIndex);
+                setStateHelper(tbl, rowIndex, columnIndex);
+            }
+        });
+        // for (let i = 0; i < tbl.rows.length; i++) {
+        //     for (let j = 0; j < tbl.rows[i].cells.length; j++) {
+        //         // tbl.rows[i].cells[j].onclick = () => {
+        //         //     if (grid[i][j] == live) {
+        //         //         grid[i][j] = dead;
+        //         //         tbl.rows[i].cells[j].className = "dead"
+        //         //     } else {
+        //         //         grid[i][j] = live;
+        //         //         tbl.rows[i].cells[j].className = "live"
+        //         //     }
+        //         // }
+        //     };
+        // }
     }
 }
 window.onload = customGrid(n);
@@ -45,11 +80,26 @@ function seedGrid(grid, n) {
 
 function findLiveNeighbours(i, j, grid, n) {
     let ctr = 0;
+    // let size=n-1;
     for (let k = -1; k < 2; k++) {
         for (let l = -1; l < 2; l++) {
-            if (grid[i + k] && grid[i + k][j + l]) {
-                ctr += grid[i + k][j + l];
+            // if (grid[i + k] && grid[i + k][j + l]) {
+            let x = (i + k) % n;
+            let y = (j + l) % n;
+            // console.log(i,j);
+            // console.log(x,y);
+            if (x < 0) {
+                // console.log(x);
+                x = n + x;
+                // console.log(x);
             }
+            if (y < 0) {
+                y = n + y;
+                // console.log(y);
+            }
+            // console.log(grid);
+            ctr += grid[x][y];
+            // }
         }
     }
     ctr -= grid[i][j];
@@ -83,7 +133,7 @@ function getNextState(i, j, n, grid) {
 async function play() {
     resetGrid();
     n = document.getElementById("cells").value || defaultNoOfCells;
-    totalGenerations = document.getElementById("totalGenerations").value||100000;
+    totalGenerations = document.getElementById("totalGenerations").value || 100000;
     clearTable(n);
     dispGridAsTable(n);
     currentGen = 1;
@@ -103,8 +153,8 @@ function reset() {
     currentGen = 1;
     toStop = false;
     clearTable(n);
-    clearTable(n,"seed");
-    totalGenerations=0;
+    clearTable(n, "seed");
+    totalGenerations = 0;
     document.getElementById("demo2").innerHTML = "";
     customGrid(n);
 }
@@ -113,7 +163,7 @@ function resetGrid() {
     currentGen = 1;
     toStop = false;
     clearTable(n);
-    totalGenerations=0;
+    totalGenerations = 0;
     document.getElementById("demo2").innerHTML = "";
     // customGrid(n);
 }
@@ -135,7 +185,7 @@ async function updateGrid() {
     document.getElementById("demo2").innerHTML = `Generation ${currentGen} of ${totalGenerations}`;
     clearTable(n);
     dispGridAsTable(n);
-    await timeout(0.75 * 1000);
+    await timeout(0.1 * 100);
 }
 
 function dispGridAsTable(n, elemId = "grid") {
