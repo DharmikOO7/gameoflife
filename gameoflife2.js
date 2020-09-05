@@ -23,14 +23,16 @@ let playPause = async () => {
         currentGen = 1;
         runningGrid = seedGrid;
         dispUITable(runningGrid, runUIElemId, dim);
-        continueGen();
         isRunning = true;
         btn.innerText = "Pause";
+        await continueGen();
     } else {
-        pauseItrn();
         isRunning = false;
+        toStop = true;
         btn.innerText = "Play";
+        pauseItrn();
     }
+    return;
 
 }
 
@@ -39,14 +41,16 @@ let continueGen = async () => {
     while (currentGen <= totalGenerations && !toStop) {
         await next();
     }
+    return;
 }
 
 let next = async () => {
-    await updateGrid(dim);
-    // ++currentGen
+    updateGrid(dim);
+    await timeout(iterDuration * 1000);
+    return;
 }
 
-let updateGrid = async (n) => {
+let updateGrid = (n) => {
     let b = initializeGridToDead(n);
     for (let i = 0; i < n; i++) {
         for (let j = 0; j < n; j++) {
@@ -60,11 +64,12 @@ let updateGrid = async (n) => {
     if (!(iterDuration > 0)) {
         iterDuration = 1;
     }
-    await timeout(iterDuration * 1000);
+    return;
 }
 
 let pauseItrn = () => {
     toStop = true;
+    return;
 }
 
 let resetRunGrid = () => {
@@ -74,7 +79,21 @@ let resetRunGrid = () => {
     pauseItrn();
     isRunning = false;
     document.getElementById("playPause").innerText = "Play";
+    return;
 }
+
+let reset = () => {
+    seedGrid = initializeGridToDead(dim);
+    runningGrid = initializeGridToDead(dim);
+    dispUITable(seedGrid, seedUIElemId, dim);
+    dispUITable(runningGrid, runUIElemId, dim);
+    currentGen = 1;
+    pauseItrn();
+    isRunning = false;
+    document.getElementById("playPause").innerText = "Play";
+    return;
+}
+
 let findLiveNeighbours = (i, j, dataGrid, n) => {
     let ctr = 0;
     // let size=n-1;
@@ -139,6 +158,7 @@ let dispUITable = (dataGrid, uiElemId, n) => {
             cell.className = classMap[dataGrid[i][j]];
         }
     }
+    return;
 }
 let connectDataToUI = (dataGrid, uiElemId, n) => {
     let uitable = document.getElementById(uiElemId);
@@ -151,12 +171,14 @@ let connectDataToUI = (dataGrid, uiElemId, n) => {
         // console.log(`Started in ${rowIndex}, ${columnIndex}`);
         setStateHelper(dataGrid, uitable, rowIndex, columnIndex);
     });
+    return;
 }
 
 let setStateHelper = (dataGrid, uiTbl, i, j) => {
     //flip state
     dataGrid[i][j] = live - dataGrid[i][j];
     uiTbl.rows[i].cells[j].className = classMap[dataGrid[i][j]];
+    return;
 }
 
 let timeout = (ms) => {
