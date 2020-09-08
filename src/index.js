@@ -2,14 +2,13 @@ import React from "react";
 import RandomPattern from "./slider";
 import ReactDOM from "react-dom";
 import "./index.css";
+import Button from "@material-ui/core/Button";
 const { nextGen, fillPattern, getRandomCell } = require("./helper");
 const { defaultPatternList, compressPattern } = require("./defaultPatterns");
 
 function Cell(props) {
   return (
-    <td className={`cell ${props.className}`} onClick={props.onClick}>
-      {props.i},{props.j}
-    </td>
+    <td className={`cell ${props.className}`} onClick={props.onClick}></td>
   );
 }
 
@@ -47,8 +46,6 @@ class Grid extends React.Component {
       <Cell
         key={i * this.props.noOfCells + j}
         value={this.props.cells[i][j]}
-        i={i}
-        j={j}
         onClick={() => this.props.handleCellClick(i, j)}
         className={this.props.cells[i][j] ? "live" : "dead"}
       />
@@ -114,6 +111,7 @@ class Game extends React.Component {
     this.savePattern = this.savePattern.bind(this);
     this.randomPattern = this.randomPattern.bind(this);
     this.clearGrid = this.clearGrid.bind(this);
+    this.resizeGrid = this.resizeGrid.bind(this);
   }
 
   clearGrid() {
@@ -234,22 +232,22 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="menu">
-          <Load
-            handleDropdownChange={this.handleDropdownChange}
-            patternExamples={this.state.patternExamples}
-          />
-          <br />
-          <button style={{ float: "left" }} onClick={this.playOrPause}>
-            {this.state.toPlay ? "Pause" : "Play"}
-          </button>
-          <br />
+          <div className="topBar" style={{ margin: "0.5rem 0.25rem" }}>
+            <Load
+              handleDropdownChange={this.handleDropdownChange}
+              patternExamples={this.state.patternExamples}
+            />
+            <Play
+              playOrPause={this.playOrPause}
+              toPlay={this.state.toPlay}
+              upgradeGrid={this.upgradeGrid}
+              clearGrid={this.clearGrid}
+            />
+          </div>
           <Save disabled={this.state.toPlay} onClick={this.savePattern} />
-          <br />
           <RandomPattern randomPattern={this.randomPattern} />
-          <br />
-          <button onClick={this.clearGrid}>Clear grid</button>
         </div>
-        <div className="game-grid" style={{ float: "right" }}>
+        <div id="game-grid" className="game-grid" style={{ float: "right" }}>
           <Grid
             currentPattern={this.state.currentPattern}
             noOfCells={this.state.noOfCells}
@@ -264,16 +262,46 @@ class Game extends React.Component {
       </div>
     );
   }
+
+  componentDidMount() {
+    this.resizeGrid();
+    window.addEventListener("resize", this.resizeGrid);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.resizeGrid);
+  }
+
+  resizeGrid() {
+    //39.552px are subtracted due to margin
+    const avlblWindowWidth = window.innerWidth - 39.552;
+    let maxNoOfCells = 25;
+    //20px is width of a cell
+    let calcNoOfCells = Math.floor(avlblWindowWidth / 20) - 1;
+    const noOfCells = Math.min(maxNoOfCells, calcNoOfCells);
+    this.setState((state) => ({
+      patternExamples: state.patternExamples,
+      currentPattern: null,
+      noOfCells,
+      cells: fillPattern(noOfCells, state.currentPattern),
+      toPlay: 0,
+      interval: 0.5,
+      generation: 0,
+    }));
+  }
 }
 
 class Load extends React.Component {
   render() {
     return (
       <label>
-        Select a pattern: <br />
-        <select defaultValue onChange={this.props.handleDropdownChange}>
+        <select
+          style={{ margin: "0.25rem" }}
+          defaultValue
+          onChange={this.props.handleDropdownChange}
+        >
           <option disabled value>
-            Select pattern
+            Load a pattern
           </option>
           {this.props.patternExamples.map((pattern, i) => (
             <option key={i} value={i}>
@@ -301,18 +329,17 @@ class Save extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
     this.props.onClick(this.state.value);
-    this.setState({ value: '' });
+    this.setState({ value: "" });
   }
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form onSubmit={this.handleSubmit} style={{ margin: "0.5rem 0.25rem" }}>
         <label>
-          Save the current pattern:
-          <br />
           <input
             type="text"
             value={this.state.value}
-            placeholder="Pattern name"
+            placeholder="Save pattern with name"
+            style={{ marginRight: "0.25rem" }}
             onChange={this.handleChange}
             disabled={this.props.disabled}
           />
@@ -323,6 +350,40 @@ class Save extends React.Component {
       </form>
     );
   }
+}
+
+function Play(props) {
+  return (
+    <div className="playBar">
+      <Button
+        size="small"
+        variant="contained"
+        color="primary"
+        // style={{ flex: 1, flexBasis: 0 }}
+        onClick={props.playOrPause}
+      >
+        {props.toPlay ? "Pause" : "Play"}
+      </Button>
+      <Button
+        size="small"
+        variant="contained"
+        color="primary"
+        // style={{ flex: 1, flexBasis: 0}}
+        disabled={Boolean(props.toPlay)}
+        onClick={props.upgradeGrid}
+      >
+        Next Gen
+      </Button>
+      <Button
+        size="small"
+        variant="contained"
+        color="primary"
+        onClick={props.clearGrid}
+      >
+        Clear grid
+      </Button>
+    </div>
+  );
 }
 
 // ========================================
