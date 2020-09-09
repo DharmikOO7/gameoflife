@@ -1,3 +1,3 @@
 # gameoflife
 A simple version of conway's game of life using Javascript
-Demo: https://dharmikoo7.github.io/gameoflife
+Demo: https://dharmikoo7.github.io/gameoflife/

@@ -1,0 +1,103 @@
+body {
+  font: 1rem "Century Gothic", Futura, sans-serif;
+  margin: 0.618rem;
+  /* background-color: #90caf9; */
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+ol,
+ul {
+  padding-left: 30px;
+}
+
+.grid-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+.status {
+  margin-bottom: 10px;
+}
+
+.cell {
+  background: #fff;
+  border: 1px solid #999;
+  float: left;
+  height: 1.25rem;
+  width: 1.25rem;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+}
+
+.cell:focus {
+  outline: none;
+}
+
+.kbd-navigation .cell:focus {
+  background: #ddd;
+}
+
+.game {
+  display: flex;
+  /* flex-direction: column; */
+  flex-wrap: wrap;
+  /* text-align: center; */
+}
+
+.menu {
+  display: flex;
+  /* flex-direction: column; */
+  flex-wrap: wrap;
+}
+
+/* .playBar {
+  display: "flex";
+  flex-direction: row;
+} */
+
+/* .playBar > Span {
+  display: inline-block;
+  width: 50%;
+  -webkit-flex: 1;
+  flex: 1;
+  -webkit-flex-basis: 0;
+  flex-basis: 0;
+} */
+
+.topBar {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.topBar > Button {
+  margin: 0 0.5rem;
+  font: 0.8125rem "Century Gothic", Futura, sans-serif;
+}
+
+.playBar > Button {
+  margin: 0 0.25rem;
+  font: 0.8125rem "Century Gothic", Futura, sans-serif;
+}
+
+.game-grid {
+  margin: 0.618rem;
+}
+
+.game-info {
+  margin-left: 20px;
+}
+
+.cell {
+  font-size: 0.5rem;
+}
+
+.cell.live {
+  background-color: black;
+}
