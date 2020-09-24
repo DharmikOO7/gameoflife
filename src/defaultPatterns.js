@@ -74,6 +74,16 @@ let defaultPatternList = [
       [0, 0, 1, 1],
     ],
   },
+  {
+    name: "R-pentomino",
+    rows: 3,
+    columns: 3,
+    data: [
+      [0, 1, 1],
+      [1, 1, 0],
+      [0, 1, 0],
+    ],
+  },
 ];
 
 module.exports = {

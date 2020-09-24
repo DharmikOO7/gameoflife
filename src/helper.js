@@ -66,12 +66,12 @@ function nextGen(n, grid) {
   return [nextGen, isSameAsPrevGen];
 }
 
-function fillPattern(noOfCells, pattern) {
-  let cells = initialize2dArray(noOfCells);
-  if (!pattern || pattern.rows > noOfCells || pattern.columns > noOfCells) {
+function fillPattern(noOfRows, pattern) {
+  let cells = initialize2dArray(noOfRows);
+  if (!pattern || pattern.rows > noOfRows || pattern.columns > noOfRows) {
     return cells;
   }
-  const gridCenter = [Math.floor(noOfCells / 2), Math.floor(noOfCells / 2)];
+  const gridCenter = [Math.floor(noOfRows / 2), Math.floor(noOfRows / 2)];
   const patternCenter = [
     Math.floor(pattern.rows / 2),
     Math.floor(pattern.columns / 2),
@@ -94,11 +94,7 @@ function fillPattern(noOfCells, pattern) {
 }
 
 function initialize2dArray(n) {
-  let a = new Array(n);
-  for (let i = 0; i < n; i++) {
-    a[i] = Array(n).fill(0);
-  }
-  return a;
+  return Array.from({length: n}, e => Array(n).fill(0));;
 }
 
 function getRandomInt(val) {

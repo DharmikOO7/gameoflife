@@ -2,9 +2,9 @@ import React from "react";
 import RandomPattern from "./slider";
 import ReactDOM from "react-dom";
 import "./index.css";
-import Button from "@material-ui/core/Button";
 const { nextGen, fillPattern, getRandomCell } = require("./helper");
 const { defaultPatternList, compressPattern } = require("./defaultPatterns");
+const { Load, Save, Play, ResizeCells, Footer } = require("./menu");
 
 function Cell(props) {
   return (
@@ -25,7 +25,7 @@ class Grid extends React.Component {
     // console.log("getDerivedStateFromProps");
     if (props.currentPattern !== state.currentPattern) {
       return {
-        noOfCells: props.noOfCells,
+        noOfRows: props.noOfRows,
         currentPattern: props.currentPattern,
         cells: props.cells,
         toPlay: false,
@@ -44,7 +44,7 @@ class Grid extends React.Component {
   renderCell(i, j) {
     return (
       <Cell
-        key={i * this.props.noOfCells + j}
+        key={i * this.props.noOfRows + j}
         value={this.props.cells[i][j]}
         onClick={() => this.props.handleCellClick(i, j)}
         className={this.props.cells[i][j] ? "live" : "dead"}
@@ -91,16 +91,17 @@ class Game extends React.Component {
       patternExamples = defaultPatternList;
       localStorage.setItem("patternList", JSON.stringify(patternExamples));
     }
+    const noOfRows = this.getNoOfRows();
     this.state = {
-      noOfCells: 25,
+      noOfRows,
       currentPattern: null,
     };
     this.state = {
       patternExamples,
       currentPattern: null,
-      noOfCells: this.state.noOfCells,
-      cells: fillPattern(this.state.noOfCells, this.state.currentPattern),
-      toPlay: 0,
+      noOfRows: this.state.noOfRows,
+      cells: fillPattern(this.state.noOfRows, this.state.currentPattern),
+      toPlay: false,
       interval: 0.5,
       generation: 0,
     };
@@ -111,6 +112,7 @@ class Game extends React.Component {
     this.savePattern = this.savePattern.bind(this);
     this.randomPattern = this.randomPattern.bind(this);
     this.clearGrid = this.clearGrid.bind(this);
+    this.fitGridToWindow = this.fitGridToWindow.bind(this);
     this.resizeGrid = this.resizeGrid.bind(this);
   }
 
@@ -118,8 +120,8 @@ class Game extends React.Component {
     this.setState((state) => ({
       patternExamples: state.patternExamples,
       currentPattern: state.currentPattern,
-      noOfCells: state.noOfCells,
-      cells: fillPattern(state.noOfCells, null),
+      noOfRows: state.noOfRows,
+      cells: fillPattern(state.noOfRows, null),
       toPlay: false,
       interval: state.interval,
       generation: 0,
@@ -136,7 +138,7 @@ class Game extends React.Component {
     this.setState((state) => ({
       patternExamples: state.patternExamples,
       currentPattern: state.currentPattern,
-      noOfCells: state.noOfCells,
+      noOfRows: state.noOfRows,
       cells,
       toPlay: false,
       interval: state.interval,
@@ -159,7 +161,7 @@ class Game extends React.Component {
     this.setState((state) => ({
       patternExamples: patternList,
       currentPattern: state.currentPattern,
-      noOfCells: state.noOfCells,
+      noOfRows: state.noOfRows,
       cells: state.cells,
       toPlay: state.toPlay,
       interval: state.interval,
@@ -169,7 +171,7 @@ class Game extends React.Component {
 
   upgradeGrid() {
     const [cells, isSameAsPrevGen] = nextGen(
-      this.state.noOfCells,
+      this.state.noOfRows,
       this.state.cells
     );
     let toPlay = this.state.toPlay;
@@ -179,7 +181,7 @@ class Game extends React.Component {
     this.setState((state) => ({
       patternExamples: state.patternExamples,
       currentPattern: state.currentPattern,
-      noOfCells: state.noOfCells,
+      noOfRows: state.noOfRows,
       cells,
       toPlay,
       interval: state.interval,
@@ -193,7 +195,7 @@ class Game extends React.Component {
     this.setState((state) => ({
       patternExamples: state.patternExamples,
       currentPattern: state.currentPattern,
-      noOfCells: state.noOfCells,
+      noOfRows: state.noOfRows,
       cells,
       toPlay: false,
       interval: state.interval,
@@ -208,8 +210,8 @@ class Game extends React.Component {
     this.setState({
       patternExamples: this.state.patternExamples,
       currentPattern,
-      noOfCells: this.state.noOfCells,
-      cells: fillPattern(this.state.noOfCells, currentPattern),
+      noOfRows: this.state.noOfRows,
+      cells: fillPattern(this.state.noOfRows, currentPattern),
       toPlay: false,
       interval: this.state.interval,
       generation: 0,
@@ -220,7 +222,7 @@ class Game extends React.Component {
     this.setState((state) => ({
       patternExamples: state.patternExamples,
       currentPattern: state.currentPattern,
-      noOfCells: state.noOfCells,
+      noOfRows: state.noOfRows,
       cells: state.cells,
       toPlay: !state.toPlay,
       interval: state.interval,
@@ -232,8 +234,9 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="menu">
-          <div className="topBar" style={{ margin: "0.5rem 0.25rem" }}>
+          <div className="topBar" style={{ margin: "0.25rem" }}>
             <Load
+              patternName={""}
               handleDropdownChange={this.handleDropdownChange}
               patternExamples={this.state.patternExamples}
             />
@@ -246,11 +249,16 @@ class Game extends React.Component {
           </div>
           <Save disabled={this.state.toPlay} onClick={this.savePattern} />
           <RandomPattern randomPattern={this.randomPattern} />
+          <ResizeCells
+            key={this.state.noOfRows}
+            resizeGrid={this.resizeGrid}
+            noOfRows={this.state.noOfRows}
+          />
         </div>
-        <div id="game-grid" className="game-grid" style={{ float: "right" }}>
+        <div id="game-grid" className="game-grid">
           <Grid
             currentPattern={this.state.currentPattern}
-            noOfCells={this.state.noOfCells}
+            noOfRows={this.state.noOfRows}
             cells={this.state.cells}
             toPlay={this.state.toPlay}
             handleCellClick={this.handleCellClick}
@@ -259,131 +267,49 @@ class Game extends React.Component {
             generation={this.state.generation}
           />
         </div>
+        <Footer />
       </div>
     );
   }
 
   componentDidMount() {
-    this.resizeGrid();
-    window.addEventListener("resize", this.resizeGrid);
+    this.fitGridToWindow();
+    window.addEventListener("resize", this.fitGridToWindow);
   }
 
   componentWillUnmount() {
-    window.removeEventListener("resize", this.resizeGrid);
+    window.removeEventListener("resize", this.fitGridToWindow);
   }
 
-  resizeGrid() {
+  fitGridToWindow() {
+    const noOfRows = this.getNoOfRows();
+    if (noOfRows !== this.state.noOfRows) {
+      this.resizeGrid(noOfRows);
+    }
+  }
+
+  getNoOfRows(maxnoOfRows = 25) {
     //39.552px are subtracted due to margin
     const avlblWindowWidth = window.innerWidth - 39.552;
-    let maxNoOfCells = 25;
+    // let maxnoOfRows = 25;
     //20px is width of a cell
-    let calcNoOfCells = Math.floor(avlblWindowWidth / 20) - 1;
-    const noOfCells = Math.min(maxNoOfCells, calcNoOfCells);
+    let calcnoOfRows = Math.floor(avlblWindowWidth / 20) - 1;
+    const noOfRows = Math.min(maxnoOfRows, calcnoOfRows);
+    return noOfRows;
+  }
+
+  resizeGrid(inpNoOfRows) {
+    const noOfRows = this.getNoOfRows(inpNoOfRows);
     this.setState((state) => ({
       patternExamples: state.patternExamples,
       currentPattern: null,
-      noOfCells,
-      cells: fillPattern(noOfCells, state.currentPattern),
-      toPlay: 0,
+      noOfRows,
+      cells: fillPattern(noOfRows, state.currentPattern),
+      toPlay: false,
       interval: 0.5,
       generation: 0,
     }));
   }
-}
-
-class Load extends React.Component {
-  render() {
-    return (
-      <label>
-        <select
-          style={{ margin: "0.25rem" }}
-          defaultValue
-          onChange={this.props.handleDropdownChange}
-        >
-          <option disabled value>
-            Load a pattern
-          </option>
-          {this.props.patternExamples.map((pattern, i) => (
-            <option key={i} value={i}>
-              {pattern.name}
-            </option>
-          ))}
-        </select>
-      </label>
-    );
-  }
-}
-
-class Save extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { value: "" };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleChange(event) {
-    this.setState({ value: event.target.value });
-  }
-
-  handleSubmit(event) {
-    event.preventDefault();
-    this.props.onClick(this.state.value);
-    this.setState({ value: "" });
-  }
-  render() {
-    return (
-      <form onSubmit={this.handleSubmit} style={{ margin: "0.5rem 0.25rem" }}>
-        <label>
-          <input
-            type="text"
-            value={this.state.value}
-            placeholder="Save pattern with name"
-            style={{ marginRight: "0.25rem" }}
-            onChange={this.handleChange}
-            disabled={this.props.disabled}
-          />
-          <button disabled={this.props.disabled || !this.state.value}>
-            Save
-          </button>
-        </label>
-      </form>
-    );
-  }
-}
-
-function Play(props) {
-  return (
-    <div className="playBar">
-      <Button
-        size="small"
-        variant="contained"
-        color="primary"
-        // style={{ flex: 1, flexBasis: 0 }}
-        onClick={props.playOrPause}
-      >
-        {props.toPlay ? "Pause" : "Play"}
-      </Button>
-      <Button
-        size="small"
-        variant="contained"
-        color="primary"
-        // style={{ flex: 1, flexBasis: 0}}
-        disabled={Boolean(props.toPlay)}
-        onClick={props.upgradeGrid}
-      >
-        Next Gen
-      </Button>
-      <Button
-        size="small"
-        variant="contained"
-        color="primary"
-        onClick={props.clearGrid}
-      >
-        Clear grid
-      </Button>
-    </div>
-  );
 }
 
 // ========================================

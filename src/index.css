@@ -46,8 +46,8 @@ ul {
 
 .game {
   display: flex;
-  /* flex-direction: column; */
-  flex-wrap: wrap;
+  flex-direction: column;
+  /* flex-wrap: wrap; */
   /* text-align: center; */
 }
 
@@ -76,6 +76,20 @@ ul {
   flex-wrap: wrap;
 }
 
+.playBar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.saveForm {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
 .topBar > Button {
   margin: 0 0.5rem;
   font: 0.8125rem "Century Gothic", Futura, sans-serif;
@@ -83,6 +97,7 @@ ul {
 
 .playBar > Button {
   margin: 0 0.25rem;
+  height: fit-content;
   font: 0.8125rem "Century Gothic", Futura, sans-serif;
 }
 

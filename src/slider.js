@@ -2,10 +2,21 @@ import React from "react";
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 import Button from "@material-ui/core/Button";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme) => ({
+  randomPattern: {
+    margin: "0.5rem 0.25rem",
+    display: "flex",
+    flexWrap: "wrap",
+    // justifyContent: "center",
+    alignContent: "center",
+  },
+}));
 
 export default function RandomPattern(props) {
   const [value, setValue] = React.useState(50);
-
+  const classes = useStyles();
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -16,8 +27,8 @@ export default function RandomPattern(props) {
   }
 
   return (
-    <div style={{margin:"0.5rem 0.25rem"}}>
-      <span>
+    <div className={classes.randomPattern}>
+      <div>
         <Typography id="continuous-slider" gutterBottom>
           Probability({value}%) of live cell
         </Typography>
@@ -32,15 +43,17 @@ export default function RandomPattern(props) {
           max={100}
           style={{ width: "29ch", margin: "0 0.5rem" }}
         />
-      </span>
-      <Button
-        size="small"
-        variant="contained"
-        color="primary"
-        onClick={handleSubmit}
-      >
-        Random pattern
-      </Button>
+      </div>
+      <div className={classes.randomPattern}>
+        <Button
+          size="small"
+          variant="contained"
+          color="primary"
+          onClick={handleSubmit}
+        >
+          Random pattern
+        </Button>
+      </div>
     </div>
   );
 }
