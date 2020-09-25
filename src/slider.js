@@ -3,13 +3,23 @@ import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
+const { ResizeCells } = require("./menu");
 
 const useStyles = makeStyles((theme) => ({
-  randomPattern: {
+  randomPatternSlider: {
     margin: "0.5rem 0.25rem",
     display: "flex",
     flexWrap: "wrap",
     // justifyContent: "center",
+    alignContent: "center",
+  },
+  randomPatternBtnAndRows: {
+    margin: "0.5rem 0.25rem",
+    display: "flex",
+    // flexWrap: "wrap",
+    flexDirection: "row",
+    // justifyContent: "center",
+    alignItems: "center",
     alignContent: "center",
   },
 }));
@@ -27,7 +37,7 @@ export default function RandomPattern(props) {
   }
 
   return (
-    <div className={classes.randomPattern}>
+    <div className={classes.randomPatternSlider}>
       <div>
         <Typography id="continuous-slider" gutterBottom>
           Probability({value}%) of live cell
@@ -44,7 +54,7 @@ export default function RandomPattern(props) {
           style={{ width: "29ch", margin: "0 0.5rem" }}
         />
       </div>
-      <div className={classes.randomPattern}>
+      <div className={classes.randomPatternBtnAndRows}>
         <Button
           size="small"
           variant="contained"
@@ -53,6 +63,11 @@ export default function RandomPattern(props) {
         >
           Random pattern
         </Button>
+        <ResizeCells
+          key={props.noOfRows}
+          resizeGrid={props.resizeGrid}
+          noOfRows={props.noOfRows}
+        />
       </div>
     </div>
   );
