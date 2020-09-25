@@ -212,4 +212,22 @@ function Footer(props) {
   );
 }
 
-export { Load, Save, Play, ResizeCells, Footer };
+function Header(props) {
+  return (
+    <div
+      id="header"
+      className="header"
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignContent: "center",
+        margin: "0.25rem"
+        // justifyContent: "center",
+      }}
+    >
+      <span style={{ fontSize: "1.5rem" }}>Conway's Game of Life</span>
+    </div>
+  );
+}
+
+export { Load, Save, Play, ResizeCells, Header, Footer };

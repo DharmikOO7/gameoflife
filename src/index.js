@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import "./index.css";
 const { nextGen, fillPattern, getRandomCell } = require("./helper");
 const { defaultPatternList, compressPattern } = require("./defaultPatterns");
-const { Load, Save, Play, ResizeCells, Footer } = require("./menu");
+const { Load, Save, Play, Header, Footer } = require("./menu");
 
 function Cell(props) {
   return (
@@ -233,6 +233,7 @@ class Game extends React.Component {
   render() {
     return (
       <div className="game">
+        <Header />
         <div className="menu">
           <div className="topBar" style={{ margin: "0.25rem" }}>
             <Load
@@ -248,8 +249,8 @@ class Game extends React.Component {
             />
           </div>
           <Save disabled={this.state.toPlay} onClick={this.savePattern} />
-          <RandomPattern randomPattern={this.randomPattern} />
-          <ResizeCells
+          <RandomPattern
+            randomPattern={this.randomPattern}
             key={this.state.noOfRows}
             resizeGrid={this.resizeGrid}
             noOfRows={this.state.noOfRows}
