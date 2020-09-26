@@ -140,15 +140,17 @@ class ResizeCells extends React.Component {
   }
 
   handleChange(e) {
-    const value = parseInt(e.target.value);
+    const value = e.target.value && parseInt(e.target.value);
     this.setState({ value });
   }
 
   handleBlur(e) {
-    const inputRows = parseInt(e.target.value);
+    const inputRows = e.target.value && parseInt(e.target.value);
     this.setState({ value: inputRows });
     if (inputRows && inputRows > 0) {
       this.props.resizeGrid(inputRows);
+    } else {
+      this.setState({ value: this.props.noOfRows });
     }
   }
 
@@ -162,6 +164,7 @@ class ResizeCells extends React.Component {
           alignContent: "center",
           display: "flex",
           flexWrap: "wrap",
+          maxWidth: "10rem"
         }}
       >
         <TextField

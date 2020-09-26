@@ -51,7 +51,7 @@ export default function RandomPattern(props) {
           aria-labelledby="continuous-slider"
           min={0}
           max={100}
-          style={{ width: "29ch", margin: "0 0.5rem" }}
+          style={{ width: "12.5rem", margin: "0 0.5rem" }}
         />
       </div>
       <div className={classes.randomPatternBtnAndRows}>
