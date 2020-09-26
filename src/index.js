@@ -13,29 +13,6 @@ function Cell(props) {
 }
 
 class Grid extends React.Component {
-  constructor(props) {
-    console.log("Grid contructor again");
-    super(props);
-    /* this.state = {
-      cells: props.cells,
-    }; */
-  }
-
-  /* static getDerivedStateFromProps(props, state) {
-    // console.log("getDerivedStateFromProps");
-    if (props.currentPattern !== state.currentPattern) {
-      return {
-        noOfRows: props.noOfRows,
-        currentPattern: props.currentPattern,
-        cells: props.cells,
-        toPlay: false,
-      };
-    }
-
-    // Return null to indicate no change to state.
-    return null;
-  } */
-
   componentWillUnmount() {
     console.log("grid unmounted");
     clearInterval(this.interval);
@@ -65,17 +42,22 @@ class Grid extends React.Component {
     return (
       <div>
         Generation #{this.props.generation}
-        <table className="holder">
-          <tbody>
-            {this.props.cells.map((row, i) => {
-              return (
-                <tr className="grid-row" key={i}>
-                  {row.map((col, j) => this.renderCell(i, j))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div style={{ display: "flex", flexWrap: "wrap" }}>
+          <table className="holder">
+            <tbody>
+              {this.props.cells.map((row, i) => {
+                return (
+                  <tr className="grid-row" key={i}>
+                    {row.map((col, j) => this.renderCell(i, j))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <span style={{ marginLeft: "1.25rem" }}>
+            Click on a cell to toggle it's state.
+          </span>
+        </div>
       </div>
     );
   }
@@ -114,6 +96,7 @@ class Game extends React.Component {
     this.clearGrid = this.clearGrid.bind(this);
     this.fitGridToWindow = this.fitGridToWindow.bind(this);
     this.resizeGrid = this.resizeGrid.bind(this);
+    this.resizeGridOnWidth = null;
   }
 
   clearGrid() {
@@ -275,11 +258,18 @@ class Game extends React.Component {
 
   componentDidMount() {
     this.fitGridToWindow();
-    window.addEventListener("resize", this.fitGridToWindow);
+    let width = window.innerWidth;
+    this.resizeGridOnWidth = () => {
+      if (width !== window.innerWidth) {
+        width = window.innerWidth;
+        this.fitGridToWindow();
+      }
+    };
+    window.addEventListener("resize", this.resizeGridOnWidth);
   }
 
   componentWillUnmount() {
-    window.removeEventListener("resize", this.fitGridToWindow);
+    window.removeEventListener("resize", this.resizeGridOnWidth);
   }
 
   fitGridToWindow() {
@@ -289,27 +279,28 @@ class Game extends React.Component {
     }
   }
 
-  getNoOfRows(maxnoOfRows = 25) {
+  getNoOfRows(maxNoOfRows = 25) {
     //39.552px are subtracted due to margin
     const avlblWindowWidth = window.innerWidth - 39.552;
-    // let maxnoOfRows = 25;
-    //20px is width of a cell
-    let calcnoOfRows = Math.floor(avlblWindowWidth / 20) - 1;
-    const noOfRows = Math.min(maxnoOfRows, calcnoOfRows);
+    //20px is width of a cell, 1px is width of cell's border,  20*n + (n-1)*1 + 2*1 = width
+    let calcNoOfRows = Math.floor((avlblWindowWidth - 1) / 21);
+    const noOfRows = Math.min(maxNoOfRows, calcNoOfRows);
     return noOfRows;
   }
 
   resizeGrid(inpNoOfRows) {
     const noOfRows = this.getNoOfRows(inpNoOfRows);
-    this.setState((state) => ({
-      patternExamples: state.patternExamples,
-      currentPattern: null,
-      noOfRows,
-      cells: fillPattern(noOfRows, state.currentPattern),
-      toPlay: false,
-      interval: 0.5,
-      generation: 0,
-    }));
+    if (noOfRows !== this.state.noOfRows) {
+      this.setState((state) => ({
+        patternExamples: state.patternExamples,
+        currentPattern: null,
+        noOfRows,
+        cells: fillPattern(noOfRows, state.currentPattern),
+        toPlay: false,
+        interval: 0.5,
+        generation: 0,
+      }));
+    }
   }
 }
 
